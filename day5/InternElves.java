@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Arrays;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 public class InternElves {
 
   public static void main( String[] args ) throws Exception {
@@ -16,7 +19,8 @@ public class InternElves {
 
       String line;
       
-      int count = 0;
+      int count1 = 0;
+      int count2 = 0;
 
       while ( ( line = bufferedReader.readLine() ) != null ) {
         if ( line.length() > 1 ) {
@@ -24,6 +28,10 @@ public class InternElves {
           boolean naughtyPair = false;
           int minVowels = 3;
           boolean doubleLetter = false;
+
+          if ( isNicerString( line ) ) {
+            count2 += 1;
+          }
 
           while ( i < line.length() - 1 && !naughtyPair ) {
             char first = line.charAt( i );
@@ -39,16 +47,17 @@ public class InternElves {
           minVowels = countVowels( line.charAt( i ), minVowels ); // count last char.
 
           if ( !naughtyPair && minVowels <= 0 && doubleLetter ) {
-            System.out.format( "String %s is nice ( %b, %d, %b )%n", line, naughtyPair, minVowels, doubleLetter );
+            // System.out.format( "String %s is nice ( %b, %d, %b )%n", line, naughtyPair, minVowels, doubleLetter );
             
-            count += 1;
+            count1 += 1;
           } else {
-            System.out.format( "String %s is naughty ( %b, %d, %b )%n", line, naughtyPair, minVowels, doubleLetter );
+            // System.out.format( "String %s is naughty ( %b, %d, %b )%n", line, naughtyPair, minVowels, doubleLetter );
           }
         }
       }
 
-      System.out.format( "Number of nice strings: %d%n", count );
+      System.out.format( "Number of nice strings (part 1): %d%n", count1 );
+      System.out.format( "Number of nice strings (part 2): %d%n", count2 );
 
       reader.close();
     } catch ( IOException e ) {
@@ -78,5 +87,14 @@ public class InternElves {
     return NAUGHTY_PAIRS.contains( pair );
   }
 
+  private static final String DUPLICATE_PAIRS = new String( "(..).*\\1" );
+  private static final String ONE_LETTER = new String( "(.).\\1" );
+  private static final Pattern rule1 = Pattern.compile( DUPLICATE_PAIRS );
+  private static final Pattern rule2 = Pattern.compile( ONE_LETTER );
+  private static boolean isNicerString( String line ) {
+    Matcher matcher1 = rule1.matcher( line );
+    Matcher matcher2 = rule2.matcher( line );
 
+    return matcher1.find() && matcher2.find();
+  }
 }
